@@ -26,8 +26,4 @@ LocateMeButton.propTypes = {
   onPress: PropTypes.func,
 };
 
-LocateMeButton.defaultProps = {
-  onPress: () => null,
-};
-
 export default LocateMeButton;
