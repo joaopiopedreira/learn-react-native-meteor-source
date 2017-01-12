@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
 import { create } from 'react-native-platform-stylesheet';
 
 // import colors from '../config/colors';
-import Router from '../config/router';
+// import Router from '../config/router';
 
 const styles = create({
   container: {
@@ -14,35 +14,27 @@ const styles = create({
     justifyContent: 'center',
     alignItems: 'center',
     // backgroundColor: colors.background,
-    backgroundColor: '#7b8d8e',
+    backgroundColor: '#e45641',
   },
 });
 
-class SignUp extends Component {
+class Profile extends Component {
   static route = {
     navigationBar: {
       visible: true,
-      title: 'Sign Up',
+      title: 'Profile',
     },
   }
-
-  goToSignIn = () => {
-    this.props.navigator.push(Router.getRoute('signIn'));
-  };
 
   render() {
     return (
       <View style={styles.container}>
-        <Text onPress={this.goToSignIn}>
-          To Sign In
+        <Text>
+          Profile Screen
         </Text>
       </View>
     );
   }
 }
 
-SignUp.propTypes = {
-  navigator: PropTypes.object.isRequired,
-};
-
-export default SignUp;
+export default Profile;
