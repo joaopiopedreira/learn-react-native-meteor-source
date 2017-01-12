@@ -1,11 +1,32 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import {
   NavigationProvider,
   StackNavigation,
   TabNavigation,
   TabNavigationItem as TabItem,
 } from '@exponent/ex-navigation';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import Router from './config/router';
+import colors from './config/colors';
+
+const renderIcon = (isSelected, name, title) => {
+  const color = isSelected ? colors.primary : colors.defaultText;
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Icon
+        name={name}
+        color={color}
+        size={28}
+      />
+      <Text
+        style={{ color }}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+};
 
 const App = () => {
   return (
@@ -17,9 +38,7 @@ const App = () => {
       >
         <TabItem
           id="home"
-          title="Home"
-          // selectedStyle={styles.selectedTab}
-          // renderIcon={(isSelected) => <Image source={require('./assets/images/home.png')} /> }
+          renderIcon={(isSelected) => renderIcon(isSelected, 'home', 'Home')}
         >
           <StackNavigation
             id="home"
@@ -29,9 +48,7 @@ const App = () => {
         </TabItem>
         <TabItem
           id="account"
-          title="Account"
-          // selectedStyle={styles.selectedTab}
-          // renderIcon={(isSelected) => <Image source={require('./assets/images/home.png')} /> }
+          renderIcon={(isSelected) => renderIcon(isSelected, 'account-circle', 'Account')}
         >
           <StackNavigation
             id="account"

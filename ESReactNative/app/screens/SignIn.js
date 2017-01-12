@@ -1,20 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import {
   View,
-  Text,
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
-
-// import colors from '../config/colors';
-// import Router from '../config/router';
+import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
+import Router from '../config/router';
+import colors from '../config/colors';
 
 const styles = create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // backgroundColor: colors.background,
-    backgroundColor: '#e45641',
+    backgroundColor: colors.background,
   },
 });
 
@@ -26,12 +22,34 @@ class SignUp extends Component {
     },
   }
 
+  static propTypes = {
+    navigator: PropTypes.object.isRequired,
+  }
+
+  signIn = () => {
+    this.props.navigator.immediatelyResetStack([Router.getRoute('profile')]);
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>
-          Sign In Screen
-        </Text>
+        <Card>
+          <FormLabel>Email or Username</FormLabel>
+          <FormInput
+            placeholder="Please enter your email or username..."
+          />
+          <FormLabel>Password</FormLabel>
+          <FormInput
+            placeholder="Please enter your password..."
+            secureTextEntry
+          />
+          <Button
+            large
+            title="Sign In"
+            buttonStyle={{ marginVertical: 20 }}
+            onPress={this.signIn}
+          />
+        </Card>
       </View>
     );
   }

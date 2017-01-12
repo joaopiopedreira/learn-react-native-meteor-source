@@ -2,19 +2,18 @@ import React, { Component, PropTypes } from 'react';
 import {
   View,
   Text,
+  TouchableOpacity,
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
+import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
 
-// import colors from '../config/colors';
+import colors from '../config/colors';
 import Router from '../config/router';
 
 const styles = create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // backgroundColor: colors.background,
-    backgroundColor: '#7b8d8e',
+    backgroundColor: colors.background,
   },
 });
 
@@ -30,12 +29,49 @@ class SignUp extends Component {
     this.props.navigator.push(Router.getRoute('signIn'));
   };
 
+  signUp = () => {
+    this.props.navigator.immediatelyResetStack([Router.getRoute('profile')]);
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text onPress={this.goToSignIn}>
-          To Sign In
-        </Text>
+        <Card>
+          <FormLabel>Email</FormLabel>
+          <FormInput
+            placeholder="Please enter your email..."
+          />
+          <FormLabel>Username</FormLabel>
+          <FormInput
+            placeholder="Please enter your username..."
+          />
+          <FormLabel>Password</FormLabel>
+          <FormInput
+            placeholder="Please enter your password..."
+            secureTextEntry
+          />
+          <FormLabel>Confirm Password</FormLabel>
+          <FormInput
+            placeholder="Please enter confirm your password..."
+            secureTextEntry
+          />
+          <Button
+            large
+            title="Sign Up"
+            buttonStyle={{ marginTop: 20 }}
+            onPress={this.signUp}
+          />
+        </Card>
+        <TouchableOpacity
+          onPress={this.goToSignIn}
+          style={{ marginTop: 20 }}
+        >
+          <Text
+            style={{ alignSelf: 'center' }}
+          >
+            Sign In
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
