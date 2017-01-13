@@ -5,7 +5,7 @@ export const TEMP_ACTIVITY = [
     createdAt: new Date(),
     username: 'john_doe',
     userId: '2',
-    type: 'checkin',
+    type: 'in',
     stationId: '1',
   },
   {
@@ -13,7 +13,7 @@ export const TEMP_ACTIVITY = [
     createdAt: new Date(),
     username: 'jane_doe',
     userId: '1',
-    type: 'checkout',
+    type: 'out',
     stationId: '1',
   }
 ];
