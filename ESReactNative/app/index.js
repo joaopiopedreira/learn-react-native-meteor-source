@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { View, Text } from 'react-native';
 import {
   NavigationProvider,
@@ -7,8 +7,12 @@ import {
   TabNavigationItem as TabItem,
 } from '@exponent/ex-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Meteor, { createContainer } from 'react-native-meteor';
 import Router from './config/router';
 import colors from './config/colors';
+import config from './config/config';
+
+Meteor.connect(config.SERVER_URL);
 
 const renderIcon = (isSelected, name, title) => {
   const color = isSelected ? colors.primary : colors.defaultText;
@@ -28,7 +32,8 @@ const renderIcon = (isSelected, name, title) => {
   );
 };
 
-const App = () => {
+const App = ({ user }) => {
+  const accountRoute = user ? Router.getRoute('profile') : Router.getRoute('signUp');
   return (
     <NavigationProvider router={Router}>
       <TabNavigation
@@ -53,7 +58,7 @@ const App = () => {
           <StackNavigation
             id="account"
             navigatorUID="account"
-            initialRoute={Router.getRoute('signUp')}
+            initialRoute={accountRoute}
           />
         </TabItem>
       </TabNavigation>
@@ -61,4 +66,12 @@ const App = () => {
   );
 };
 
-export default App;
+App.propTypes = {
+  user: PropTypes.object,
+};
+
+export default createContainer(() => {
+  return {
+    user: Meteor.user(),
+  };
+}, App);

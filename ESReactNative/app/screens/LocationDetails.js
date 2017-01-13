@@ -5,9 +5,10 @@ import {
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
 import { Card, Button, List, ListItem } from 'react-native-elements';
+import Meteor, { createContainer } from 'react-native-meteor';
+import _ from 'lodash';
 
 import colors from '../config/colors';
-// import Router from '../config/router';
 import { TEMP_ACTIVITY } from '../config/tempData';
 
 const styles = create({
@@ -17,22 +18,29 @@ const styles = create({
 });
 
 class LocationDetails extends Component {
-  static route = {
-    navigationBar: {
-      visible: true,
-      title: 'Location Details',
-    },
-  }
-
   static defaultProps = {
     // activity: [],
     activity: TEMP_ACTIVITY,
   }
 
   attemptCheckin = () => {
-    const LOGGED_IN = false;
-    if (LOGGED_IN) {
+    const { location } = this.props;
+    let status = 'in';
+    if (location.checkedInUserId) {
+      status = 'out';
+    }
+
+    if (this.props.user !== null) {
       // TODO: Stuff
+      Meteor.call('Locations.changeCheckin', { locationId: location._id, status }, (err) => {
+        if (err) {
+          // TODO: Handle error
+          // eslint-disable-next-line no-console
+          console.log('Locations.changeCheckin error: ', err);
+        } else {
+          // TODO: Optimistic update?
+        }
+      });
     } else {
       this.props.navigation.performAction(({ tabs }) => {
         tabs('main').jumpToTab('account');
@@ -41,7 +49,7 @@ class LocationDetails extends Component {
   };
 
   render() {
-    const { location } = this.props.route.params;
+    const location = this.props.location || _.get(this.props, 'route.params.location', {});
     return (
       <ScrollView style={styles.container}>
         <Card
@@ -62,6 +70,7 @@ class LocationDetails extends Component {
           title="Activity"
         >
           <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0, marginTop: 0 }}>
+            {/* TODO: Handle when there is no activity */}
             {
               this.props.activity.map((l) => (
                 <ListItem
@@ -81,8 +90,29 @@ class LocationDetails extends Component {
 
 LocationDetails.propTypes = {
   navigation: PropTypes.object.isRequired,
-  route: PropTypes.object,
   activity: PropTypes.array,
+  user: PropTypes.object,
+  location: PropTypes.object,
 };
 
-export default LocationDetails;
+const ConnectedLocationDetails = createContainer((params) => {
+  const location = _.get(params, 'route.params.location', {});
+  Meteor.subscribe('Locations.pub.details', { locationId: location._id });
+  const activityHandle = Meteor.subscribe('Activity.pub.list', { locationId: location._id });
+  return {
+    user: Meteor.user(),
+    location: Meteor.collection('locations').findOne({ _id: location._id }),
+    activityReady: activityHandle.ready(),
+    activity: Meteor.collection('activity').find({ locationId: location._id }),
+  };
+}, LocationDetails);
+
+// TODO: Is there a better way to do this?
+ConnectedLocationDetails.route = {
+  navigationBar: {
+    visible: true,
+    title: 'Location Details',
+  },
+};
+
+export default ConnectedLocationDetails;

@@ -7,8 +7,8 @@ import { Activity } from '../activity/activity';
 export const getNearestLocations = new ValidatedMethod({
   name: 'Locations.getNearestLocations',
   validate: new SimpleSchema({
-    latitude: { type: Number },
-    longitude: { type: Number },
+    latitude: { type: Number, decimal: true },
+    longitude: { type: Number, decimal: true },
   }).validator(),
   run({ latitude, longitude }) {
     const query = {
@@ -24,11 +24,12 @@ export const getNearestLocations = new ValidatedMethod({
       },
     };
 
+    // TODO: Only return the necessary fields
     const options = {
       limit: 10,
     };
 
-    return Locations.find(query, options);
+    return Locations.find(query, options).fetch();
   },
 });
 
@@ -55,7 +56,7 @@ export const changeCheckinStatus = new ValidatedMethod({
         'You\'re already checked in at this location.');
     }
 
-    if (status === 'in' && location.checkedInUserId !== null) {
+    if (status === 'in' && typeof location.checkedInUserId === 'string') {
       throw new Meteor.Error('Locations.changeCheckin.checkedInByDifferentUser',
         'Someone is already checked in at this location.');
     }
@@ -71,12 +72,21 @@ export const changeCheckinStatus = new ValidatedMethod({
         'You\'re already checked in at a different location.');
     }
 
-    Locations.update({ _id: locationId }, {
-      $set: {
-        checkedInUserId: this.userId,
-        updatedAt: new Date(),
-      },
-    });
+    if (status === 'in') {
+      Locations.update({ _id: locationId }, {
+        $set: {
+          checkedInUserId: this.userId,
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      Locations.update({ _id: locationId }, {
+        $set: {
+          checkedInUserId: null,
+          updatedAt: new Date(),
+        },
+      });
+    }
 
     Activity.insert({
       createdAt: new Date(),

@@ -4,11 +4,11 @@ import {
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
 import { List, ListItem } from 'react-native-elements';
+import _ from 'lodash';
 
 import colors from '../config/colors';
 import NotFound from '../components/NotFound';
 import Router from '../config/router';
-import { TEMP_LOCATIONS } from '../config/tempData';
 
 const styles = create({
   container: {
@@ -44,13 +44,14 @@ class NearMe extends Component {
   };
 
   render() {
+    const locations = _.get(this.props, 'route.params.locations', []);
     return (
       <ScrollView style={styles.container}>
         {
-          this.props.locations.length === 0 ? <NotFound text="No locations found." /> :
+          locations.length === 0 ? <NotFound text="No locations found." /> :
           <List>
             {
-              this.props.locations.map((l) => (
+              locations.map((l) => (
                 <ListItem
                   roundAvatar
                   key={l._id}
@@ -69,12 +70,6 @@ class NearMe extends Component {
 
 NearMe.propTypes = {
   navigator: PropTypes.object.isRequired,
-  locations: PropTypes.array,
-};
-
-NearMe.defaultProps = {
-  // locations: [],
-  locations: TEMP_LOCATIONS,
 };
 
 export default NearMe;

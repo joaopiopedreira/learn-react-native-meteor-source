@@ -4,6 +4,7 @@ import {
   View,
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
+import Meteor from 'react-native-meteor';
 import Router from '../config/router';
 import colors from '../config/colors';
 import LocateMeButton from '../components/LocateMeButton';
@@ -25,9 +26,20 @@ const styles = create({
 
 class FindNearMe extends Component {
   handleGeolocationSuccess = (position) => {
-    // eslint-disable-next-line no-console
-    console.log('position', position);
-    this.props.navigator.push(Router.getRoute('nearMe'));
+    const params = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
+    // TODO: Setting a loading state and handle it in the UI
+    Meteor.call('Locations.getNearestLocations', params, (err, locations) => {
+      if (err) {
+        // TODO: Handle error
+        // eslint-disable-next-line no-console
+        console.log('Locations.getNearestLocations error: ', err);
+      } else {
+        this.props.navigator.push(Router.getRoute('nearMe', { locations }));
+      }
+    });
   };
 
   handleGeolocationError = (error) => {

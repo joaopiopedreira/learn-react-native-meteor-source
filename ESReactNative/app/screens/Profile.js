@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { create } from 'react-native-platform-stylesheet';
 import { Button } from 'react-native-elements';
+import Meteor from 'react-native-meteor';
 
 import Router from '../config/router';
 import colors from '../config/colors';
@@ -31,6 +32,7 @@ class Profile extends Component {
   }
 
   signOut = () => {
+    Meteor.logout();
     this.props.navigator.immediatelyResetStack([Router.getRoute('signUp')]);
   };
 
