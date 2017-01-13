@@ -24,8 +24,24 @@ const styles = create({
 });
 
 class FindNearMe extends Component {
-  goToNearMe = () => {
+  handleGeolocationSuccess = (position) => {
+    // eslint-disable-next-line no-console
+    console.log('position', position);
     this.props.navigator.push(Router.getRoute('nearMe'));
+  };
+
+  handleGeolocationError = (error) => {
+    // TODO: Better handle error
+    // eslint-disable-next-line no-alert
+    alert(JSON.stringify(error));
+  };
+
+  goToNearMe = () => {
+    navigator.geolocation.getCurrentPosition(
+      this.handleGeolocationSuccess,
+      this.handleGeolocationError,
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
   };
 
   render() {
