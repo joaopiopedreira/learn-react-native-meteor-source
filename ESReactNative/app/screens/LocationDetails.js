@@ -1,26 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import {
   Text,
-  ScrollView,
 } from 'react-native';
-import { create } from 'react-native-platform-stylesheet';
 import { Card, Button, List, ListItem } from 'react-native-elements';
 import Meteor, { createContainer } from 'react-native-meteor';
 import _ from 'lodash';
-
 import colors from '../config/colors';
-import { TEMP_ACTIVITY } from '../config/tempData';
-
-const styles = create({
-  container: {
-    backgroundColor: colors.background,
-  },
-});
+import Container from '../components/Container';
 
 class LocationDetails extends Component {
   static defaultProps = {
-    // activity: [],
-    activity: TEMP_ACTIVITY,
+    activity: [],
   }
 
   attemptCheckin = () => {
@@ -51,7 +41,7 @@ class LocationDetails extends Component {
   render() {
     const location = this.props.location || _.get(this.props, 'route.params.location', {});
     return (
-      <ScrollView style={styles.container}>
+      <Container scroll>
         <Card
           title={location.station_name}
         >
@@ -83,7 +73,7 @@ class LocationDetails extends Component {
             }
           </List>
         </Card>
-      </ScrollView>
+      </Container>
     );
   }
 }

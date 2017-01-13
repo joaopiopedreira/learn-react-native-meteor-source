@@ -1,23 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  View,
   Text,
 } from 'react-native';
-import { create } from 'react-native-platform-stylesheet';
 import { Button } from 'react-native-elements';
 import Meteor from 'react-native-meteor';
 
 import Router from '../config/router';
-import colors from '../config/colors';
-
-const styles = create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-});
+import Container from '../components/Container';
 
 class Profile extends Component {
   static route = {
@@ -38,7 +27,7 @@ class Profile extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <Container>
         <Text>
           Profile Screen
         </Text>
@@ -48,7 +37,7 @@ class Profile extends Component {
           buttonStyle={{ marginVertical: 20 }}
           onPress={this.signOut}
         />
-      </View>
+      </Container>
     );
   }
 }

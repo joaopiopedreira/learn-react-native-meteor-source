@@ -1,51 +1,39 @@
 import React, { Component, PropTypes } from 'react';
-import {
-  Text,
-  View,
-} from 'react-native';
-import { create } from 'react-native-platform-stylesheet';
 import Meteor from 'react-native-meteor';
 import Router from '../config/router';
-import colors from '../config/colors';
+import config from '../config/config';
 import LocateMeButton from '../components/LocateMeButton';
-
-const styles = create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-    color: colors.defaultText,
-  },
-});
+import Container from '../components/Container';
+import { Header } from '../components/Text';
 
 class FindNearMe extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: false,
+    };
+  }
+
   handleGeolocationSuccess = (position) => {
     const params = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     };
-    // TODO: Setting a loading state and handle it in the UI
+
+    this.setState({ loading: true });
     Meteor.call('Locations.getNearestLocations', params, (err, locations) => {
       if (err) {
-        // TODO: Handle error
-        // eslint-disable-next-line no-console
-        console.log('Locations.getNearestLocations error: ', err);
+        this.props.navigator.showLocalAlert(err.reason, config.errorStyles);
       } else {
         this.props.navigator.push(Router.getRoute('nearMe', { locations }));
       }
+      this.setState({ loading: false });
     });
   };
 
   handleGeolocationError = (error) => {
-    // TODO: Better handle error
-    // eslint-disable-next-line no-alert
-    alert(JSON.stringify(error));
+    this.props.navigator.showLocalAlert(error.message, config.errorStyles);
   };
 
   goToNearMe = () => {
@@ -58,14 +46,15 @@ class FindNearMe extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <Container>
         <LocateMeButton
           onPress={this.goToNearMe}
+          loading={this.state.loading}
         />
-        <Text style={styles.welcome}>
+        <Header>
           Find Nearest Charging Stations
-        </Text>
-      </View>
+        </Header>
+      </Container>
     );
   }
 }

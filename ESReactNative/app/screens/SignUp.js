@@ -1,22 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  View,
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { create } from 'react-native-platform-stylesheet';
 import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
 import { Accounts } from 'react-native-meteor';
-
-import colors from '../config/colors';
+import Container from '../components/Container';
 import Router from '../config/router';
-
-const styles = create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});
 
 class SignUp extends Component {
   static route = {
@@ -87,7 +77,7 @@ class SignUp extends Component {
   render() {
     // TODO: Handle loading state
     return (
-      <View style={styles.container}>
+      <Container scroll>
         <Card>
           <FormLabel>Email</FormLabel>
           <FormInput
@@ -141,7 +131,7 @@ class SignUp extends Component {
             Sign In
           </Text>
         </TouchableOpacity>
-      </View>
+      </Container>
     );
   }
 }

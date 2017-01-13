@@ -1,20 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import {
-  ScrollView,
-} from 'react-native';
-import { create } from 'react-native-platform-stylesheet';
 import { List, ListItem } from 'react-native-elements';
 import _ from 'lodash';
-
-import colors from '../config/colors';
 import NotFound from '../components/NotFound';
 import Router from '../config/router';
-
-const styles = create({
-  container: {
-    backgroundColor: colors.background,
-  },
-});
+import Container from '../components/Container';
 
 class NearMe extends Component {
   static route = {
@@ -46,7 +35,7 @@ class NearMe extends Component {
   render() {
     const locations = _.get(this.props, 'route.params.locations', []);
     return (
-      <ScrollView style={styles.container}>
+      <Container scroll>
         {
           locations.length === 0 ? <NotFound text="No locations found." /> :
           <List>
@@ -63,7 +52,7 @@ class NearMe extends Component {
             }
           </List>
         }
-      </ScrollView>
+      </Container>
     );
   }
 }
