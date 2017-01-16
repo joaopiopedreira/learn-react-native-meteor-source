@@ -15,7 +15,7 @@ import config from './config/config';
 Meteor.connect(config.SERVER_URL);
 
 const renderIcon = (isSelected, name, title) => {
-  const color = isSelected ? colors.primary : colors.defaultText;
+  const color = isSelected ? colors.primary : colors.iconSubtle;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Icon

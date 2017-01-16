@@ -1,3 +1,5 @@
-import Form from './Form';
+import Input from './Input';
+import PrimaryButton from './PrimaryButton';
+import SecondaryButton from './SecondaryButton';
 
-export default Form;
+export { Input, PrimaryButton, SecondaryButton };

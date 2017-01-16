@@ -1,12 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import {
-  Text,
-} from 'react-native';
-import { Button } from 'react-native-elements';
 import Meteor from 'react-native-meteor';
-
 import Router from '../config/router';
 import Container from '../components/Container';
+import { PrimaryButton } from '../components/Form';
+import { Header } from '../components/Text';
 
 class Profile extends Component {
   static route = {
@@ -28,13 +25,11 @@ class Profile extends Component {
   render() {
     return (
       <Container>
-        <Text>
+        <Header>
           Profile Screen
-        </Text>
-        <Button
-          large
+        </Header>
+        <PrimaryButton
           title="Sign Out"
-          buttonStyle={{ marginVertical: 20 }}
           onPress={this.signOut}
         />
       </Container>

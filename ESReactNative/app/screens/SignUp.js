@@ -1,12 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import {
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
+import { Card } from 'react-native-elements';
 import { Accounts } from 'react-native-meteor';
 import Container from '../components/Container';
 import Router from '../config/router';
+import config from '../config/config';
+import { Input, PrimaryButton, SecondaryButton } from '../components/Form';
 
 class SignUp extends Component {
   static route = {
@@ -24,6 +22,7 @@ class SignUp extends Component {
       username: '',
       password: '',
       confirmPassword: '',
+      loading: false,
     };
   }
 
@@ -33,28 +32,27 @@ class SignUp extends Component {
 
   signUp = () => {
     const { email, username, password, confirmPassword } = this.state;
+
     if (email.length === 0) {
-      // TODO: Show error
-      return;
+      return this.props.navigator.showLocalAlert('Email is required.', config.errorStyles);
     }
 
     if (username.length === 0) {
-      // TODO: Show error
-      return;
+      return this.props.navigator.showLocalAlert('Username is required.', config.errorStyles);
     }
 
     if (password.length === 0 || password !== confirmPassword) {
-      // TODO: Show error
-      return;
+      return this.props.navigator.showLocalAlert('Passwords must match.', config.errorStyles);
     }
 
-    // TODO: Set a loading state
-    Accounts.createUser({ username, email, password }, (err) => {
+    this.setState({ loading: true });
+    return Accounts.createUser({ username, email, password }, (err) => {
       if (err) {
-        // TODO: Handle error
+        this.props.navigator.showLocalAlert(err.reason, config.errorStyles);
       } else {
         this.props.navigator.immediatelyResetStack([Router.getRoute('profile')]);
       }
+      this.setState({ loading: false });
     });
   };
 
@@ -75,62 +73,47 @@ class SignUp extends Component {
   };
 
   render() {
-    // TODO: Handle loading state
     return (
       <Container scroll>
         <Card>
-          <FormLabel>Email</FormLabel>
-          <FormInput
+          <Input
+            label="Email"
             placeholder="Please enter your email..."
             value={this.state.email}
             onChangeText={this.handleChangeEmail}
             keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <FormLabel>Username</FormLabel>
-          <FormInput
+          <Input
+            label="Username"
             placeholder="Please enter your username..."
             value={this.state.username}
             onChangeText={(text) => this.handleChangeText(text, 'username')}
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <FormLabel>Password</FormLabel>
-          <FormInput
+          <Input
+            label="Password"
             placeholder="Please enter your password..."
             secureTextEntry
             value={this.state.password}
             onChangeText={(text) => this.handleChangeText(text, 'password')}
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <FormLabel>Confirm Password</FormLabel>
-          <FormInput
+          <Input
+            label="Confirm Password"
             placeholder="Please enter confirm your password..."
             secureTextEntry
             value={this.state.confirmPassword}
             onChangeText={(text) => this.handleChangeText(text, 'confirmPassword')}
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <Button
-            large
+          <PrimaryButton
             title="Sign Up"
-            buttonStyle={{ marginTop: 20 }}
             onPress={this.signUp}
+            loading={this.state.loading}
           />
         </Card>
-        <TouchableOpacity
+
+        <SecondaryButton
+          title="Sign In"
           onPress={this.goToSignIn}
-          style={{ marginTop: 20 }}
-        >
-          <Text
-            style={{ alignSelf: 'center' }}
-          >
-            Sign In
-          </Text>
-        </TouchableOpacity>
+        />
       </Container>
     );
   }

@@ -1,8 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { FormLabel, FormInput, Button, Card } from 'react-native-elements';
+import { Card } from 'react-native-elements';
 import Meteor from 'react-native-meteor';
 import Router from '../config/router';
 import Container from '../components/Container';
+import { Input, PrimaryButton } from '../components/Form';
+import config from '../config/config';
 
 class SignUp extends Component {
   static route = {
@@ -27,20 +29,20 @@ class SignUp extends Component {
 
   signIn = () => {
     const { emailOrUsername, password } = this.state;
+
     if (emailOrUsername.length === 0) {
-      // TODO: Show error
-      return;
+      return this.props.navigator.showLocalAlert('Email or username is required.', config.errorStyles);
     }
 
     if (password.length === 0) {
-      // TODO: Show error
-      return;
+      return this.props.navigator.showLocalAlert('Password is required.', config.errorStyles);
     }
 
-    // TODO: Set a loading state
-    Meteor.loginWithPassword(emailOrUsername, password, (err) => {
+    this.setState({ loading: true });
+    return Meteor.loginWithPassword(emailOrUsername, password, (err) => {
+      this.setState({ loading: false });
       if (err) {
-        // TODO: Handle error
+        this.props.navigator.showLocalAlert(err.reason, config.errorStyles);
       } else {
         this.props.navigator.immediatelyResetStack([Router.getRoute('profile')]);
       }
@@ -54,30 +56,24 @@ class SignUp extends Component {
   };
 
   render() {
-    // TODO: Handle a loading state
     return (
       <Container scroll>
         <Card>
-          <FormLabel>Email or Username</FormLabel>
-          <FormInput
+          <Input
+            label="Email or Username"
             placeholder="Please enter your email or username..."
             onChangeText={(text) => this.handleTextChange(text, 'emailOrUsername')}
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <FormLabel>Password</FormLabel>
-          <FormInput
+          <Input
+            label="Password"
             placeholder="Please enter your password..."
             secureTextEntry
             onChangeText={(text) => this.handleTextChange(text, 'password')}
-            autoCapitalize="none"
-            autoCorrect={false}
           />
-          <Button
-            large
+          <PrimaryButton
             title="Sign In"
-            buttonStyle={{ marginVertical: 20 }}
             onPress={this.signIn}
+            loading={this.state.loading}
           />
         </Card>
       </Container>

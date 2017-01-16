@@ -24,9 +24,15 @@ export const getNearestLocations = new ValidatedMethod({
       },
     };
 
-    // TODO: Only return the necessary fields
     const options = {
       limit: 10,
+      fields: {
+        _id: 1,
+        station_name: 1,
+        street_address: 1,
+        access_days_time: 1,
+        groups_with_access_code: 1,
+      },
     };
 
     return Locations.find(query, options).fetch();

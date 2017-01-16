@@ -42,7 +42,6 @@ class NearMe extends Component {
             {
               locations.map((l) => (
                 <ListItem
-                  roundAvatar
                   key={l._id}
                   title={l.station_name}
                   subtitle={this.subTitle(l)}
