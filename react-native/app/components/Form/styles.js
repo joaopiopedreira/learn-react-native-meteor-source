@@ -15,4 +15,7 @@ export default create({
     alignSelf: 'center',
     color: colors.textSubtle,
   },
+  input: {
+    height: 40,
+  },
 });

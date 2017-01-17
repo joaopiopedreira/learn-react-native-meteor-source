@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { View } from 'react-native';
 import { FormLabel, FormInput } from 'react-native-elements';
+import styles from './styles';
 
 const Input = (props) => {
   return (
@@ -9,6 +10,7 @@ const Input = (props) => {
       <FormInput
         autoCapitalize="none"
         autoCorrect={false}
+        inputStyle={styles.input}
         {...props}
       />
     </View>
