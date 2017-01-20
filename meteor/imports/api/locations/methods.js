@@ -19,7 +19,6 @@ export const getNearestLocations = new ValidatedMethod({
             coordinates: [longitude, latitude],
           },
           $minDistance: 0,
-          $maxDistance: 5000,
         },
       },
     };
