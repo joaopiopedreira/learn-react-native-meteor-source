@@ -6,7 +6,7 @@ import Container from '../components/Container';
 import { Input, PrimaryButton } from '../components/Form';
 import config from '../config/config';
 
-class SignUp extends Component {
+class SignIn extends Component {
   static route = {
     navigationBar: {
       visible: true,
@@ -81,4 +81,4 @@ class SignUp extends Component {
   }
 }
 
-export default SignUp;
+export default SignIn;
