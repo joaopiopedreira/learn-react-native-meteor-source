@@ -1,11 +1,20 @@
-import { Mongo } from 'meteor/mongo';
+import OfflineMongo from '../../api/offlineCollections/collectionTransformer';
+import OfflineCollectionVersions from '../../api/offlineCollections/offlineCollectionVersions';
+import { Random } from 'meteor/random';
+const collectionName = 'locations';
 
-export const Locations = new Mongo.Collection('locations');
+OfflineCollectionVersions.remove({collection:collectionName});
+OfflineCollectionVersions.insert({
+    collection:collectionName,
+    offlineVersion: Random.id()
+});
+
+export const Locations = new OfflineMongo(collectionName);
 
 Locations.rawCollection().createIndex({ location: '2dsphere' });
 
 Locations.allow({
-  insert: () => false,
-  update: () => false,
-  remove: () => false,
+    insert: () => false,
+    update: () => true,
+    remove: () => false,
 });
