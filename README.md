@@ -73,10 +73,48 @@ This is done at the `Bulk` class (`react-native/app/config/offlineCollections/Bu
 An offline-first app must be very aggressive when is comes to fetching and 
 storing the data. The network may go down in the next minute and we might not
 have the chance to do it then. So, what I do is to fetch and store the server
-data as soon as I can. I'm doing this after a successful login:
+data as soon as I can. I'm doing this after a successful login: when we detect a valid
+user `Meteor.user()`, we launch our `subscribe` function that will do three main things:
 
+- Subscribe to the `OfflineCollectionVersions` and `users` collections (the later
+to enable us to have the user object offline) we must publish the users collection 
+on the meteor side:
+```
+Meteor.publish('users', function getUsersForOffline(userId) {
+    return Meteor.users.find(userId);
+});
+```
 
+- Subscribe to ddp add/change events related with `OfflineCollectionVersions` changes. This 
+ is what triggers our main collections syncing.
 
+- Finally, initiate the sync process in each collection we want to maintain offline (
+`Locations` and `Activity`).
+
+I'm bringing the full `Locations` collection (yes, all the 17K records) to the client. 
+After that, when we press the "find near me" button we're still querying the 10 closest
+locations (courtesy of `minimongo-cache` on which `react-native-meteor` depends; they've
+implemented a subset of mongo's geolocation queries on the client. Cool!).
+
+So, immediately after you login, the client will load all the data from the server and
+save it on the client. If you then disconnect the meteor server, you'll see that the app
+continues to work normally. You can check in/out from the gas stations normally and those
+changes are stored in the client. Once you reestablish the connection with meteor, all
+the changes are fired to the server and everything is updated.
+
+If you want, you can try it with more than one client and see that the changes are propagated
+to all clients simultaneously. This is, in fact, a clone of the meteor pub/sub system: we
+use methods to do it, but the result is the same.
+
+Having developed for mobile with meteor/cordova in the last 2 years, I've come to realise 
+that mobile internet connections are to unreliable. This method illustrated here gives us
+extra assurance concerning data consistency in the app: one method call per collection is
+what it takes to make one "subscription". If it fails, we continue using the data we already
+have on the device. If it succeeds and the connection drops right after, no problem - all 
+subsequent operations (collection hydration) are performed on the client and do not need
+a connection to the server.
+
+This is work in progress and I hope some of you can join me to make this better.
 
 # Original Readme from Spencer Carli
 
