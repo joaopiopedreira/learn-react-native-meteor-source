@@ -20,7 +20,6 @@ Meteor.methods({
      * @returns {{newDocs: Array, updatedDocs: Array, removedDocs: Array}}
      */
     offlineGetChanges: function(params) {
-        console.log(params);
         check(params, {
             existing: Array,
             name: String,
@@ -70,6 +69,9 @@ Meteor.methods({
         results.removed = existingIds.filter(function (docId) {
             return !(docId in currentIds);
         });
+
+        console.log(`Output from offlineGetChanges: Collection: ${params.name};  newDocs: ${results.newDocs.length}; updatedDocs: ${results.updatedDocs.length}; removedDocs: ${results.removedDocs.length}`);
+        console.dir(results.updatedDocs);
 
         return results;
     }

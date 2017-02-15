@@ -73,7 +73,7 @@ class SignIn extends Component {
                     />
                     <PrimaryButton
                         title="Sign In"
-                        onPress={this.signIn()}
+                        onPress={this.signIn}
                         loading={this.state.loading}
                     />
                 </Card>

@@ -5,6 +5,10 @@ import { Random } from 'meteor/random';
 import { Locations } from '../../api/locations/locations';
 
 Meteor.startup(() => {
+
+  // Only uncomment to reset the database
+  //Locations.remove({});
+
   if (Locations.find().count() === 0) {
     const fuelStations = JSON.parse(Assets.getText('alt_fuel_stations.json'));
 
@@ -22,6 +26,7 @@ Meteor.startup(() => {
         _id: Random.id(),
         ...location,
         location: { type: 'Point', coordinates: [location.longitude, location.latitude] },
+        checkedInUserId: ''
       });
     });
     bulkLocationsOp.executeSync();

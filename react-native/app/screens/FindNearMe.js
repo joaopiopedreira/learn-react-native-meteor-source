@@ -6,8 +6,6 @@ import LocateMeButton from '../components/LocateMeButton';
 import Container from '../components/Container';
 import {Header} from '../components/Text';
 import Locations from '../config/offlineCollections/Locations';
-import Activity from '../config/offlineCollections/Activity';
-import OfflineCollectionVersions from '../../app/config/offlineCollections/OfflineCollectionVersions';
 
 
 class FindNearMe extends Component {
@@ -21,7 +19,9 @@ class FindNearMe extends Component {
 
     data = () => {
 
-        return {}
+        return {
+            connectionStatus: Meteor.status().status
+        }
     };
 
     handleGeolocationSuccess = (position) => {
@@ -29,8 +29,6 @@ class FindNearMe extends Component {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
         };
-
-        console.log(params);
 
         this.setState({ loading: true });
         const query = {
@@ -93,8 +91,13 @@ class FindNearMe extends Component {
     };
 
     render() {
+        const connected = `Connection status: ${this.data().connectionStatus}`;
+
         return (
             <Container>
+                <Header>
+                    {connected}
+                </Header>
                 <LocateMeButton
                     onPress={this.goToNearMe}
                     loading={this.state.loading}
@@ -114,37 +117,6 @@ FindNearMe.propTypes = {
 //export default FindNearMe;
 
 const ConnectedLocationDetails = createContainer((params) => {
-
-    const options = {
-        limit: 10,
-        fields: {
-            _id: 1,
-            station_name: 1,
-            street_address: 1,
-            access_days_time: 1,
-            groups_with_access_code: 1,
-            checkedInUserId: 1
-        },
-    };
-
-    !Locations.ready() && Locations.sync({
-        query: {},
-        hydrate: true,
-        options: options,
-        syncCallback: (locations) => {
-            console.log('syncing Locations in SignIn.js');
-            console.log(`Number of locations: ${locations && locations.length}`);
-        }
-    });
-
-    !Activity.ready() && Activity.sync({
-        query: {},
-        hydrate: false,
-        syncCallback: (activity) => {
-            console.log('syncing Activity in SignIn.js');
-            console.log(`Number of activities: ${activity && activity.length}`);
-        }
-    });
 
     return {}
 }, FindNearMe);

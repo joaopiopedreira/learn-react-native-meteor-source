@@ -12,6 +12,7 @@ import NotFound from '../components/NotFound';
 import {Header} from '../components/Text';
 import Activity from '../config/offlineCollections/Activity';
 import Locations from '../config/offlineCollections/Locations';
+import config from '../config/config';
 
 
 const CHECKED_IN = 'in';
@@ -50,39 +51,44 @@ class LocationDetails extends Component {
         if (!this.data().user) {
             const error = 'Must be logged in to change checkin status.';
             this.props.navigator.showLocalAlert(error, config.errorStyles);
+            return;
         }
 
-        if (status === 'in' && location.checkedInUserId === this.data().user._id) {
+        if (status === 'in' && location.checkedInUserId === this.data().userId) {
             const error = `You're already checked in at this location.`;
             this.props.navigator.showLocalAlert(error, config.errorStyles);
+            return;
         }
 
-        if (status === 'in' && typeof location.checkedInUserId === 'string') {
+        if (status === 'in' && location.checkedInUserId) {
             const error = 'Someone is already checked in at this location.';
             this.props.navigator.showLocalAlert(error, config.errorStyles);
+            return;
         }
 
         if (status === 'out' && location.checkedInUserId !== this.data().userId) {
             const error = `You're not checked into this location.`;
             this.props.navigator.showLocalAlert(error, config.errorStyles);
+            return;
         }
 
-        const existingCheckin = Locations.findOne({ checkedInUserId: this.data().user._id });
+        const existingCheckin = Locations.findOne({ checkedInUserId: this.data().userId });
         if (status === 'in' && existingCheckin) {
             const error = `You're already checked in at a different location.`;
             this.props.navigator.showLocalAlert(error, config.errorStyles);
+            return;
         }
 
         if (status === 'in') {
-            Locations.update({ _id: locationId }, {
+            Locations.update(locationId, {
                 $set: {
-                    checkedInUserId: this.data().user._id,
+                    checkedInUserId: this.data().user._id
                 },
             });
         } else {
-            Locations.update({ _id: locationId }, {
+            Locations.update(locationId, {
                 $set: {
-                    checkedInUserId: null,
+                    checkedInUserId: ''
                 },
             });
         }
@@ -149,10 +155,7 @@ class LocationDetails extends Component {
 
     render() {
         const location = this.data().location || _.get(this.props, 'route.params.location', {});
-        console.log(location);
         const checkedIn = location.checkedInUserId === this.data().userId; //_.get(this.props, 'user._id', '');
-        console.log(`location.checkedInUserId: ${location.checkedInUserId}`);
-        console.log(`this.data().userId: ${this.data().userId}`);
 
         return (
             <Container scroll>
@@ -197,19 +200,6 @@ LocationDetails.defaultProps = {
 };
 
 const ConnectedLocationDetails = createContainer((params) => {
-
-    // const location = _.get(params, 'route.params.location', {});
-    // Meteor.subscribe('Locations.pub.details', {locationId: location._id});
-    // const activityHandle = Meteor.subscribe('Activity.pub.list', {locationId: location._id});
-
-    !Activity.ready() && Activity.sync({
-        query: {},
-        hydrate: true,
-        syncCallback: (activity) => {
-            console.log('syncing Activity in SignIn.js');
-            console.log(`Number of activities: ${activity && activity.length}`);
-        }
-    });
 
     return {};
 }, LocationDetails);

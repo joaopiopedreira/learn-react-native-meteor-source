@@ -3,11 +3,12 @@ import OfflineCollectionVersions from '../../api/offlineCollections/offlineColle
 import { Random } from 'meteor/random';
 const collectionName = 'locations';
 
-OfflineCollectionVersions.remove({collection:collectionName});
-OfflineCollectionVersions.insert({
-    collection:collectionName,
-    offlineVersion: Random.id()
-});
+if(!OfflineCollectionVersions.findOne({collection:collectionName})) {
+    OfflineCollectionVersions.insert({
+        collection:collectionName,
+        offlineVersion: Random.id()
+    });
+}
 
 export const Locations = new OfflineMongo(collectionName);
 
