@@ -51,9 +51,9 @@ export default class OfflineCollection extends Collection {
             super.update(id, modifier, options, callback);
 
             // Update the offlineCollectionVersions versions collection
-            this.updateServerVersions((err,res) => {
-                if(err) {
-                    console.error('error updating server versions',err);
+            this.updateServerVersions((err, res) => {
+                if (err) {
+                    console.error('error updating server versions', err);
                 } else {
                     console.log(`server versions updated! Method: "update"; Collection "${this.name}"; Id: ${res}`);
                 }
@@ -73,13 +73,13 @@ export default class OfflineCollection extends Collection {
             super.insert( item, callback );
 
             // Update the offlineCollectionVersions versions collection
-            this.updateServerVersions((err,res) => {
-                if(err) {
-                    console.error('error updating server versions',err);
-                } else {
-                    console.log(`server versions updated! Method: "insert"; Collection "${this.name}" new Id: ${res}`);
-                }
-            })
+                this.updateServerVersions((err, res) => {
+                    if (err) {
+                        console.error('error updating server versions', err);
+                    } else {
+                        console.log(`server versions updated! Method: "insert"; Collection "${this.name}" new Id: ${res}`);
+                    }
+                })
         };
 
         /**
@@ -92,7 +92,7 @@ export default class OfflineCollection extends Collection {
             super.remove( id, callback );
 
             // Update the offlineCollectionVersions versions collection
-            this.updateServerVersions((err) => {
+            this.updateServerVersions((err,res) => {
                 if(err) {
                     console.error('error updating server versions');
                 } else {

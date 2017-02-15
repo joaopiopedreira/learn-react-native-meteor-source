@@ -7,6 +7,7 @@ import {Header} from '../components/Text';
 import Locations from '../config/offlineCollections/Locations';
 import Activity from '../config/offlineCollections/Activity';
 import moment from 'moment';
+import { AsyncStorage } from 'react-native'
 
 class Profile extends Component {
     static route = {
@@ -44,6 +45,8 @@ class Profile extends Component {
         Locations.clear(true);
         Activity.clear(true);
         Meteor.logout();
+        AsyncStorage.removeItem('offlineCollection:offlineUser');
+        AsyncStorage.removeItem('offlineCollection:offlineCollectionVersions');
         this.props.navigator.immediatelyResetStack([Router.getRoute('signUp')]);
     };
 

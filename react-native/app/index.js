@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {View, Text} from 'react-native';
+import { View, Text, AsyncStorage } from 'react-native';
 import {
     NavigationProvider,
     StackNavigation,
@@ -14,7 +14,7 @@ import config from './config/config';
 import Locations from './config/offlineCollections/Locations';
 import Activity from './config/offlineCollections/Activity';
 import OfflineCollectionVersions from './config/offlineCollections/OfflineCollectionVersions';
-
+import OfflineUser from './config/offlineCollections/OfflineUser'
 
 
 Meteor.connect(config.SERVER_URL);
@@ -113,10 +113,36 @@ export default createContainer(() => {
     );
 
     const subscribe = (query) => {
-        if (Meteor.user()) {
-            //console.log(`We've got a user. Email is ${Meteor.user().emails[0].address}`);
 
-            Meteor.subscribe('offlineCollectionVersions');
+        if(Meteor.user()) {
+            // Store the user object offline
+            Meteor.subscribe('users', Meteor.userId(), (err,res) => {
+
+                const userObject = OfflineUser.find()[0];
+
+                if (userObject) {
+                    OfflineUser.store(userObject);
+                }
+            });
+
+            // When offline, seed it with the values stored in AsyncStorage.
+            if (OfflineUser.find().length === 0) {
+                OfflineUser.seed();
+            }
+
+            // Store the collection "OfflineCollectionVersions" for offline use
+            Meteor.subscribe('offlineCollectionVersions', (err) => {
+                const items = OfflineCollectionVersions.find();
+
+                if (items.length > 0) {
+                    OfflineCollectionVersions.store(items);
+                }
+            });
+
+            // When offline, this collection will be emptied. Seed it with the values stored in AsyncStorage.
+            if (OfflineCollectionVersions.find().length === 0) {
+                OfflineCollectionVersions.seed();
+            }
 
             const options = {
                 //limit: 100,
@@ -131,6 +157,30 @@ export default createContainer(() => {
                     __offlineVersion: 1
                 }
             };
+
+            // Sync the Locations collection
+            if (Locations.find().length === 0) {
+                !Locations.syncing && Locations.sync({
+                    query: query,
+                    options: options,
+                    syncCallback: (locations) => {
+                        console.log('synced Locations in index.js');
+                        console.log(`Number of locations: ${locations && locations.length}`);
+                    }
+                });
+            }
+
+            // Sync the Activity collection
+            if (Activity.find().length === 0) {
+                !Activity.syncing && Activity.sync({
+                    query: {},
+                    syncCallback: (activity) => {
+                        console.log('synced Activity in index.js');
+                        console.log(`Number of activities: ${activity && activity.length}`);
+                    }
+                });
+            }
+
 
             Meteor.ddp.on('added', (payload) => {
                 //console.log('Doc added', payload);
@@ -166,8 +216,8 @@ export default createContainer(() => {
             Meteor.ddp.on('changed', (payload) => {
                 //console.log('Doc changed', payload);
 
-                const locationsOfflineVersionId = OfflineCollectionVersions.findOne({collection:'locations'})._id;
-                const activityOfflineVersionId = OfflineCollectionVersions.findOne({collection:'activity'})._id;
+                const locationsOfflineVersionId = OfflineCollectionVersions.findOne({collection: 'locations'})._id;
+                const activityOfflineVersionId = OfflineCollectionVersions.findOne({collection: 'activity'})._id;
 
                 // Sync the Locations collection
                 if (payload && payload.collection === 'offlineCollectionVersions') {
@@ -175,7 +225,6 @@ export default createContainer(() => {
                     const oldLocationsOfflineVersion = OfflineCollectionVersions.findOne(locationsOfflineVersionId).offlineVersion;
                     const newActivityOfflineVersion = payload.fields && (payload.id === activityOfflineVersionId) && payload.fields.offlineVersion;
                     const oldActivityOfflineVersion = OfflineCollectionVersions.findOne(activityOfflineVersionId).offlineVersion;
-
 
 
                     // Sync the Locations collection
@@ -213,12 +262,12 @@ export default createContainer(() => {
 
                 }
             });
-
         }
+
     };
 
 
     return {
-        user: Meteor.user(),
+        user: OfflineUser.user(),
     };
 }, App);

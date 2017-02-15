@@ -13,6 +13,7 @@ import {Header} from '../components/Text';
 import Activity from '../config/offlineCollections/Activity';
 import Locations from '../config/offlineCollections/Locations';
 import config from '../config/config';
+import OfflineUser from '../config/offlineCollections/OfflineUser';
 
 
 const CHECKED_IN = 'in';
@@ -31,7 +32,7 @@ class LocationDetails extends Component {
         const locationId = this.props.route.params.location._id;
         const location = Locations.findOne(locationId);
         const activities = Activity.find({ locationId: locationId }, {sort: {createdAt: -1}});
-        const user = Meteor.user();
+        const user = OfflineUser.user();
 
         return {
             user: user,
@@ -40,7 +41,7 @@ class LocationDetails extends Component {
             location: location,
             locationId: locationId,
             activityCount: activities.length,
-            userId: user._id,
+            userId: user && user._id,
             activities: activities
         }
     };
@@ -80,12 +81,16 @@ class LocationDetails extends Component {
         }
 
         if (status === 'in') {
+            this.data().location.checkedInUserId = this.data().userId;
+
             Locations.update(locationId, {
                 $set: {
-                    checkedInUserId: this.data().user._id
+                    checkedInUserId: this.data().userId
                 },
             });
         } else {
+            this.data().location.checkedInUserId = '';
+
             Locations.update(locationId, {
                 $set: {
                     checkedInUserId: ''
@@ -95,8 +100,8 @@ class LocationDetails extends Component {
 
         Activity.insert({
             createdAt: new Date(),
-            username: this.data().user.username,
-            userId: this.data().user._id,
+            username: this.data().user && this.data().user.username,
+            userId: this.data().userId,
             type: status,
             locationId,
         });
@@ -130,27 +135,40 @@ class LocationDetails extends Component {
     };
 
     renderItems = () => {
-        if (!this.data().activitiesReady) {
-            return <Header>Loading...</Header>;
-        } else {
-            if (this.data().activities.length === 0) {
-                return (
-                    <NotFound
-                        text="No activity yet."
-                        small
-                    />
-                );
+        if(Meteor.status().connected) {
+            if (!this.data().activitiesReady) {
+                return <Header>Loading...</Header>;
+            } else {
+                if (this.data().activities.length === 0) {
+                    return (
+                        <NotFound
+                            text="No activity yet."
+                            small
+                        />
+                    );
+                }
             }
+
+            return this.data().activities.map((a) => (
+                <ListItem
+                    key={a._id}
+                    title={a.username}
+                    subtitle={moment(a.createdAt).format('MMM Do @ h:mma')}
+                    rightTitle={a.type === CHECKED_IN ? 'Checked In' : 'Checked Out'}
+                />
+            ));
+
+        } else {
+            return this.data().activities.map((a) => (
+                <ListItem
+                    key={a._id}
+                    title={a.username}
+                    subtitle={moment(a.createdAt).format('MMM Do @ h:mma')}
+                    rightTitle={a.type === CHECKED_IN ? 'Checked In' : 'Checked Out'}
+                />
+            ));
         }
 
-        return this.data().activities.map((a) => (
-            <ListItem
-                key={a._id}
-                title={a.username}
-                subtitle={moment(a.createdAt).format('MMM Do @ h:mma')}
-                rightTitle={a.type === CHECKED_IN ? 'Checked In' : 'Checked Out'}
-            />
-        ));
     };
 
     render() {
